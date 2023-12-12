@@ -1,1 +1,3 @@
-# DSAN_5000
+# DSAN 5000: Data Science and Analytics
+
+This course introduces students to several core data science concepts. It teaches students how to synthesize disparate, possibly unstructured data to better understand and characterize the world, and in some cases, to draw meaningful inferences. Topics covered include: the history of data science, successes and failures in data analytics, the data analytics life cycle, data/web scraping and APIs, data wrangling, data characterization (correlations, identifying clusters and associations), data inference and basic machine learning, network analysis, data ethics, and visual analytics. Students will work on a semester-long data science project that starts with question formulation and data collection, and goes through all the stages of the life cycle, culminating in data storytelling. The course also maps data science case studies to topics presented throughout the semester.
