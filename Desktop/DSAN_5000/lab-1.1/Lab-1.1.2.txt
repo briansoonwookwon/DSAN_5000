@@ -1,0 +1,474 @@
+[bskgeorg@gtown3 ~]$ # comments start with the hash just like in python, this line has no effect
+[bskgeorg@gtown3 ~]$ ls
+access-logs  logs  perl5       public_html  tmp
+etc          mail  public_ftp  ssl          www
+[bskgeorg@gtown3 ~]$   ls # this will list everything in the directory
+access-logs  logs  perl5       public_html  tmp
+etc          mail  public_ftp  ssl          www
+[bskgeorg@gtown3 ~]$ ls *pub*
+public_ftp:
+incoming
+
+public_html:
+bg.jpg   default.html  index.html
+cgi-bin  files         jquery.backstretch.min.js
+[bskgeorg@gtown3 ~]$ ls -d *pub*
+public_ftp  public_html
+[bskgeorg@gtown3 ~]$ ls *pub*/*.html
+public_html/default.html  public_html/index.html
+[bskgeorg@gtown3 ~]$ pwd
+/home/bskgeorg
+[bskgeorg@gtown3 ~]$ find -name index.html
+./tmp/webalizer/index.html
+./tmp/webalizer/ssl/bsk.georgetown.domains/index.html
+./public_html/index.html
+[bskgeorg@gtown3 ~]$ find -name index*
+./tmp/webalizer/index.html
+./tmp/webalizer/ssl/bsk.georgetown.domains/index.html
+./public_html/index.html
+[bskgeorg@gtown3 ~]$ cd public_html/
+[bskgeorg@gtown3 public_html]$ more index.html
+<html>
+    <head>
+    </head>
+    <body>
+    <h1>Hello World: from the command line</h1>
+    </body>
+</html>
+[bskgeorg@gtown3 public_html]$ less index.html
+[bskgeorg@gtown3 public_html]$ head index.html
+<html>
+    <head>
+    </head>
+    <body>
+    <h1>Hello World: from the command line</h1>
+    </body>
+</html>
+[bskgeorg@gtown3 public_html]$ tail index.html
+<html>
+    <head>
+    </head>
+    <body>
+    <h1>Hello World: from the command line</h1>
+    </body>
+</html>
+[bskgeorg@gtown3 public_html]$ tail -n 4 index.html
+    <body>
+    <h1>Hello World: from the command line</h1>
+    </body>
+</html>
+[bskgeorg@gtown3 public_html]$ grep 'Hello' index.html
+    <h1>Hello World: from the command line</h1>
+[bskgeorg@gtown3 public_html]$ pwd ../
+/home/bskgeorg/public_html
+[bskgeorg@gtown3 public_html]$ ls ../
+access-logs  logs  perl5       public_html  tmp
+etc          mail  public_ftp  ssl          www
+[bskgeorg@gtown3 public_html]$ cd ../
+[bskgeorg@gtown3 ~]$ ls ./
+access-logs  logs  perl5       public_html  tmp
+etc          mail  public_ftp  ssl          www
+[bskgeorg@gtown3 ~]$ cd publi_html
+bash: cd: publi_html: No such file or directory
+[bskgeorg@gtown3 ~]$ cd public_html
+[bskgeorg@gtown3 public_html]$ pwd ./
+/home/bskgeorg/public_html
+[bskgeorg@gtown3 public_html]$ cd ~/
+[bskgeorg@gtown3 ~]$ pwd
+/home/bskgeorg
+[bskgeorg@gtown3 ~]$ cd public_html
+[bskgeorg@gtown3 public_html]$ cd public_html/
+bash: cd: public_html/: No such file or directory
+[bskgeorg@gtown3 public_html]$ mkdir files
+[bskgeorg@gtown3 public_html]$ ls
+bg.jpg   default.html  index.html
+cgi-bin  files         jquery.backstretch.min.js
+[bskgeorg@gtown3 public_html]$ cd files
+[bskgeorg@gtown3 files]$ > page2.html
+[bskgeorg@gtown3 files]$ ls
+page2.html
+[bskgeorg@gtown3 files]$ cp ../index.html ./page3.html
+[bskgeorg@gtown3 files]$ more page2.html
+[bskgeorg@gtown3 files]$ more page3.html
+<html>
+    <head>
+    </head>
+    <body>
+    <h1>Hello World: from the command line</h1>
+    </body>
+</html>
+[bskgeorg@gtown3 files]$ pwd
+/home/bskgeorg/public_html/files
+[bskgeorg@gtown3 files]$ cat /proc/cpuinfo
+processor       : 0
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 85
+model name      : Intel(R) Xeon(R) Silver 4214R CPU @ 2.40GHz
+stepping        : 7
+microcode       : 0x5003102
+cpu MHz         : 2328.952
+cache size      : 16896 KB
+physical id     : 0
+siblings        : 24
+core id         : 0
+cpu cores       : 12
+apicid          : 0
+initial apicid  : 0
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr ssesse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tscart arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu cpuid_faulting pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb cat_l3 cdp_l3 invpcid_single intel_pt ssbd mba ibrs ibpb stibpibrs_enhanced tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req pku ospke avx512_vnni md_clear spec_ctrl intel_stibp flush_l1d arch_capabilities
+bogomips        : 4800.00
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 46 bits physical, 48 bits virtual
+power management:
+
+processor       : 1
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 85
+model name      : Intel(R) Xeon(R) Silver 4214R CPU @ 2.40GHz
+stepping        : 7
+microcode       : 0x5003102
+cpu MHz         : 2328.952
+cache size      : 16896 KB
+physical id     : 0
+siblings        : 24
+core id         : 1
+cpu cores       : 12
+apicid          : 2
+initial apicid  : 2
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr ssesse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tscart arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu cpuid_faulting pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb cat_l3 cdp_l3 invpcid_single intel_pt ssbd mba ibrs ibpb stibpibrs_enhanced tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req pku ospke avx512_vnni md_clear spec_ctrl intel_stibp flush_l1d arch_capabilities
+bogomips        : 4800.00
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 46 bits physical, 48 bits virtual
+power management:
+
+processor       : 2
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 85
+model name      : Intel(R) Xeon(R) Silver 4214R CPU @ 2.40GHz
+stepping        : 7
+microcode       : 0x5003102
+cpu MHz         : 2328.952
+cache size      : 16896 KB
+physical id     : 0
+siblings        : 24
+core id         : 2
+cpu cores       : 12
+apicid          : 4
+initial apicid  : 4
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr ssesse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tscart arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu cpuid_faulting pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb cat_l3 cdp_l3 invpcid_single intel_pt ssbd mba ibrs ibpb stibpibrs_enhanced tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req pku ospke avx512_vnni md_clear spec_ctrl intel_stibp flush_l1d arch_capabilities
+bogomips        : 4800.00
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 46 bits physical, 48 bits virtual
+power management:
+
+processor       : 3
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 85
+model name      : Intel(R) Xeon(R) Silver 4214R CPU @ 2.40GHz
+stepping        : 7
+microcode       : 0x5003102
+cpu MHz         : 2328.952
+cache size      : 16896 KB
+physical id     : 0
+siblings        : 24
+core id         : 3
+cpu cores       : 12
+apicid          : 6
+initial apicid  : 6
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr ssesse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tscart arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu cpuid_faulting pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb cat_l3 cdp_l3 invpcid_single intel_pt ssbd mba ibrs ibpb stibpibrs_enhanced tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req pku ospke avx512_vnni md_clear spec_ctrl intel_stibp flush_l1d arch_capabilities
+bogomips        : 4800.00
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 46 bits physical, 48 bits virtual
+power management:
+
+processor       : 4
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 85
+model name      : Intel(R) Xeon(R) Silver 4214R CPU @ 2.40GHz
+stepping        : 7
+microcode       : 0x5003102
+cpu MHz         : 2328.952
+cache size      : 16896 KB
+physical id     : 0
+siblings        : 24
+core id         : 4
+cpu cores       : 12
+apicid          : 8
+initial apicid  : 8
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr ssesse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tscart arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu cpuid_faulting pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb cat_l3 cdp_l3 invpcid_single intel_pt ssbd mba ibrs ibpb stibpibrs_enhanced tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req pku ospke avx512_vnni md_clear spec_ctrl intel_stibp flush_l1d arch_capabilities
+bogomips        : 4800.00
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 46 bits physical, 48 bits virtual
+power management:
+
+processor       : 5
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 85
+model name      : Intel(R) Xeon(R) Silver 4214R CPU @ 2.40GHz
+stepping        : 7
+microcode       : 0x5003102
+cpu MHz         : 2328.952
+cache size      : 16896 KB
+physical id     : 0
+siblings        : 24
+core id         : 5
+cpu cores       : 12
+apicid          : 10
+initial apicid  : 10
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr ssesse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tscart arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu cpuid_faulting pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb cat_l3 cdp_l3 invpcid_single intel_pt ssbd mba ibrs ibpb stibpibrs_enhanced tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req pku ospke avx512_vnni md_clear spec_ctrl intel_stibp flush_l1d arch_capabilities
+bogomips        : 4800.00
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 46 bits physical, 48 bits virtual
+power management:
+
+processor       : 6
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 85
+model name      : Intel(R) Xeon(R) Silver 4214R CPU @ 2.40GHz
+stepping        : 7
+microcode       : 0x5003102
+cpu MHz         : 2328.952
+cache size      : 16896 KB
+physical id     : 0
+siblings        : 24
+core id         : 8
+cpu cores       : 12
+apicid          : 16
+initial apicid  : 16
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr ssesse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tscart arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu cpuid_faulting pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb cat_l3 cdp_l3 invpcid_single intel_pt ssbd mba ibrs ibpb stibpibrs_enhanced tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req pku ospke avx512_vnni md_clear spec_ctrl intel_stibp flush_l1d arch_capabilities
+bogomips        : 4800.00
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 46 bits physical, 48 bits virtual
+power management:
+
+processor       : 7
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 85
+model name      : Intel(R) Xeon(R) Silver 4214R CPU @ 2.40GHz
+stepping        : 7
+microcode       : 0x5003102
+cpu MHz         : 2328.952
+cache size      : 16896 KB
+physical id     : 0
+siblings        : 24
+core id         : 9
+cpu cores       : 12
+apicid          : 18
+initial apicid  : 18
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr ssesse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tscart arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu cpuid_faulting pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb cat_l3 cdp_l3 invpcid_single intel_pt ssbd mba ibrs ibpb stibpibrs_enhanced tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req pku ospke avx512_vnni md_clear spec_ctrl intel_stibp flush_l1d arch_capabilities
+bogomips        : 4800.00
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 46 bits physical, 48 bits virtual
+power management:
+
+processor       : 8
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 85
+model name      : Intel(R) Xeon(R) Silver 4214R CPU @ 2.40GHz
+stepping        : 7
+microcode       : 0x5003102
+cpu MHz         : 2328.952
+cache size      : 16896 KB
+physical id     : 0
+siblings        : 24
+core id         : 10
+cpu cores       : 12
+apicid          : 20
+initial apicid  : 20
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr ssesse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tscart arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu cpuid_faulting pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb cat_l3 cdp_l3 invpcid_single intel_pt ssbd mba ibrs ibpb stibpibrs_enhanced tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req pku ospke avx512_vnni md_clear spec_ctrl intel_stibp flush_l1d arch_capabilities
+bogomips        : 4800.00
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 46 bits physical, 48 bits virtual
+power management:
+
+processor       : 9
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 85
+model name      : Intel(R) Xeon(R) Silver 4214R CPU @ 2.40GHz
+stepping        : 7
+microcode       : 0x5003102
+cpu MHz         : 2328.952
+cache size      : 16896 KB
+physical id     : 0
+siblings        : 24
+core id         : 11
+cpu cores       : 12
+apicid          : 22
+initial apicid  : 22
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr ssesse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tscart arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu cpuid_faulting pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb cat_l3 cdp_l3 invpcid_single intel_pt ssbd mba ibrs ibpb stibpibrs_enhanced tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req pku ospke avx512_vnni md_clear spec_ctrl intel_stibp flush_l1d arch_capabilities
+bogomips        : 4800.00
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 46 bits physical, 48 bits virtual
+power management:
+
+processor       : 10
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 85
+model name      : Intel(R) Xeon(R) Silver 4214R CPU @ 2.40GHz
+stepping        : 7
+microcode       : 0x5003102
+cpu MHz         : 2328.952
+cache size      : 16896 KB
+physical id     : 0
+siblings        : 24
+core id         : 12
+cpu cores       : 12
+apicid          : 24
+initial apicid  : 24
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 22
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr ssesse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tscart arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu cpuid_faulting pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb cat_l3 cdp_l3 invpcid_single intel_pt ssbd mba ibrs ibpb stibpibrs_enhanced tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req pku ospke avx512_vnni md_clear spec_ctrl intel_stibp flush_l1d arch_capabilities
+bogomips        : 4800.00
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 46 bits physical, 48 bits virtual
+power management:
+
+[bskgeorg@gtown3 files]$ history
+    1  2023-08-30 23:29:43 cd ~/
+    2  2023-08-30 23:29:51 nano ./public_html/index.html
+    3  2023-08-30 23:32:21 more index.html
+    4  2023-08-30 23:32:26 index.html
+    5  2023-08-30 23:32:29 ls
+    6  2023-08-30 23:32:43 ./public_html/index.html
+    7  2023-08-30 23:34:24 ls
+    8  2023-08-30 23:34:25 clear
+    9  2023-08-30 23:35:13 ls *pub*
+   10  2023-08-30 23:35:32 ls -d  *pub*
+   11  2023-08-30 23:36:01 ls *pub*; ls *pub*/*.html
+   12  2023-08-30 23:36:16 pwd
+   13  2023-08-30 23:36:28 find -name index.html
+   14  2023-08-30 23:36:46 find -name index*
+   15  2023-08-30 23:37:02 cd public_html/
+   16  2023-08-30 23:37:16 more index.html
+   17  2023-08-30 23:37:25 less index.html
+   18  2023-08-30 23:37:34 head index.html
+   19  2023-08-30 23:37:40 tail index.html
+   20  2023-08-30 23:37:50 tail -n 4 index.html
+   21  2023-08-30 23:37:58 head -n 3 index.html
+   22  2023-08-30 23:38:17 grep 'Hello' index.html
+   23  2023-08-30 23:38:28 pwd ../
+   24  2023-08-30 23:38:35 ls ../
+   25  2023-08-30 23:38:39 cd ../
+   26  2023-08-30 23:38:48 ls ./
+   27  2023-08-30 23:38:50 ls
+   28  2023-08-30 23:38:58 cd public html/
+   29  2023-08-30 23:39:00 pwd ./
+   30  2023-08-30 23:39:12 cd ~/
+   31  2023-08-30 23:39:16 pwd
+   32  2023-08-30 23:39:33 cd public_html/
+   33  2023-08-30 23:39:35 pwd
+   34  2023-08-30 23:39:49 cd public_html/
+   35  2023-08-30 23:40:03 mkdir files
+   36  2023-08-30 23:40:05 ls
+   37  2023-08-30 23:40:22 cd files
+   38  2023-08-30 23:40:38 > page2.html
+   39  2023-08-30 23:40:41 ls
+   40  2023-08-30 23:40:56 cp ../index.html ./page3.html
+   41  2023-08-30 23:41:02 more page2.html
+   42  2023-08-30 23:41:08 more page3.html
+   43  2023-08-30 23:41:12 pwd
+   44  2023-08-30 23:41:21 cat /proc/cpuinfo
+   45  2023-08-30 23:41:56 history
+   46  2023-09-04 23:19:06 ls
+   47  2023-09-04 23:19:10 clear
+   48  2023-09-04 23:19:29 # comments start with the hash just like in python, this line has no effect
+   49  2023-09-04 23:19:31 ls
+   50  2023-09-04 23:19:58   ls # this will list everythingin the directory
+   51  2023-09-04 23:20:11 ls *pub*
+   52  2023-09-04 23:20:26 ls -d *pub*
+   53  2023-09-04 23:20:35 ls *pub*/*.html
+   54  2023-09-04 23:20:40 pwd
+   55  2023-09-04 23:20:51 find -name index.html
+   56  2023-09-04 23:21:22 find -name index*
+   57  2023-09-04 23:21:33 cd public_html/
+   58  2023-09-04 23:21:44 more index.html
+   59  2023-09-04 23:21:51 less index.html
+   60  2023-09-04 23:22:05 head index.html
+   61  2023-09-04 23:22:13 tail index.html
+   62  2023-09-04 23:22:23 tail -n 4 index.html
+   63  2023-09-04 23:22:38 grep 'Hello' index.html
+   64  2023-09-04 23:22:45 pwd ../
+   65  2023-09-04 23:22:50 ls ../
+   66  2023-09-04 23:22:53 cd ../
+   67  2023-09-04 23:22:57 ls ./
+   68  2023-09-04 23:23:04 cd publi_html
+   69  2023-09-04 23:23:11 cd public_html
+   70  2023-09-04 23:23:28 pwd ./
+   71  2023-09-04 23:23:39 cd ~/
+   72  2023-09-04 23:23:43 pwd
+   73  2023-09-04 23:23:50 cd public_html
+   74  2023-09-04 23:24:00 cd public_html/
+   75  2023-09-04 23:24:12 mkdir files
+   76  2023-09-04 23:25:20 ls
+   77  2023-09-04 23:25:32 cd files
+   78  2023-09-04 23:25:43 > page2.html
+   79  2023-09-04 23:25:46 ls
+   80  2023-09-04 23:26:03 cp ../index.html ./page3.html
+   81  2023-09-04 23:26:12 more page2.html
+   82  2023-09-04 23:26:17 more page3.html
+   83  2023-09-04 23:26:19 pwd
+   84  2023-09-04 23:26:30 cat /proc/cpuinfo
+   85  2023-09-04 23:26:34 history

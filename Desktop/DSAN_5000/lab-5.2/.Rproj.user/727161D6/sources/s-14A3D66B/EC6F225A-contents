@@ -1,0 +1,14 @@
+
+library('tidymodels')
+boost_tree() %>%
+  set_mode("classification") %>%
+  set_engine("xgboost")
+install.packages("scales")
+remove.packages("rlang")
+install.packages("rlang")
+
+library(tidyverse)
+remove.packages("tidymodels")
+remove
+
+devtools::install_github("tidyverse/tidyverse")

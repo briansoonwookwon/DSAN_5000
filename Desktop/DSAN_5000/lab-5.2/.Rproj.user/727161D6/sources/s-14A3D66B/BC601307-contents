@@ -1,0 +1,252 @@
+---
+title: "Lab 10 - ANLY512"
+author: "Dr. Purna Gamage, Anderson Monken"
+date: "4/7/2021"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+    toc_level: 4
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+---
+
+```{r}
+library('sparkline')
+```
+
+# Walkthrough
+
+### Classification trees 
+
+#### Setup
+
+```{r}
+library(tidyverse)
+library(tree)
+library(ISLR)
+library(caret)
+library(rpart)
+library(rattle)
+library(visNetwork)
+```
+
+```{r}
+#attach(Carseats)
+hist(Carseats$Sales)
+
+Carseats <- Carseats %>% mutate(High = if_else(Sales <= 8, 0, 1) %>% as.factor())
+```
+
+#### Initial tree
+
+```{r}
+tree.carseats=tree::tree(High~.,data=Carseats %>% select(-Sales))
+
+summary(tree.carseats)
+plot(tree.carseats)
+text(tree.carseats,pretty=0) #annotate
+```
+
+#### Train/test split
+
+```{r}
+set.seed(2)
+train=sample(1:nrow(Carseats), 200)
+Carseats.test=Carseats[-train,]
+tree.carseats=tree(High~.-Sales,Carseats,subset=train)
+tree.pred=predict(tree.carseats,Carseats.test,type="class")
+confusionMatrix(tree.pred,Carseats.test$High)
+```
+
+#### Pruning the tree using CV
+
+```{r}
+set.seed(3)
+cv.carseats=cv.tree(tree.carseats,FUN=prune.misclass)
+names(cv.carseats)
+cv.carseats
+par(mfrow=c(1,2))
+plot(cv.carseats$size,cv.carseats$dev,type="b")
+plot(cv.carseats$k,cv.carseats$dev,type="b")
+prune.carseats=prune.misclass(tree.carseats,best=9)
+plot(prune.carseats)
+text(prune.carseats,pretty=0)
+tree.pred=predict(prune.carseats,Carseats.test,type="class")
+confusionMatrix(tree.pred,Carseats.test$High)
+```
+
+#### Pruning the tree manually
+
+```{r}
+prune.carseats=prune.misclass(tree.carseats,best=15)
+plot(prune.carseats)
+text(prune.carseats,pretty=0)
+tree.pred=predict(prune.carseats,Carseats.test,type="class")
+confusionMatrix(tree.pred,Carseats.test$High)
+```
+
+
+### Fitting Regression Trees 
+
+#### Initial tree - using rpart and rattle / visNetwork
+
+```{r}
+library(MASS)
+set.seed(1)
+train = sample(1:nrow(Boston), nrow(Boston)/2)
+tree.boston=tree(medv~.,Boston,subset=train)
+summary(tree.boston)
+tree.boston2=rpart(medv~.,Boston,subset=train)
+fancyRpartPlot(tree.boston2)
+visTree(tree.boston2)
+```
+
+#### Pruning tree - using rpart and visNetwork
+
+```{r}
+cv.boston=cv.tree(tree.boston)
+plot(cv.boston$size,cv.boston$dev,type='b')
+prune.boston=prune.tree(tree.boston,best=5)
+plot(prune.boston)
+text(prune.boston,pretty=0)
+yhat=predict(tree.boston,newdata=Boston[-train,])
+boston.test=Boston[-train,"medv"]
+plot(yhat,boston.test)
+abline(0,1)
+mean((yhat-boston.test)^2)
+```
+
+
+
+### Bagging and Random Forests 
+
+#### Bagging mtry = # variables
+
+![](rf-meme.png)
+
+
+```{r}
+library(randomForest)
+set.seed(1)
+bag.boston=randomForest(medv~.,data=Boston,subset=train,mtry=13,importance=TRUE)
+bag.boston
+yhat.bag = predict(bag.boston,newdata=Boston[-train,])
+plot(yhat.bag, boston.test)
+abline(0,1)
+mean((yhat.bag-boston.test)^2)
+```
+
+#### Adjust number of trees
+
+```{r}
+bag.boston=randomForest(medv~.,data=Boston,subset=train,mtry=13,ntree=25)
+yhat.bag = predict(bag.boston,newdata=Boston[-train,])
+mean((yhat.bag-boston.test)^2)
+```
+
+#### Random forest mtry < # variables
+
+```{r}
+set.seed(1)
+rf.boston=randomForest(medv~.,data=Boston,subset=train,mtry=6,importance=TRUE)
+yhat.rf = predict(rf.boston,newdata=Boston[-train,])
+mean((yhat.rf-boston.test)^2)
+importance(rf.boston)
+varImpPlot(rf.boston)
+```
+
+### Boosting
+
+```{r}
+library(gbm)
+set.seed(1)
+boost.boston=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=5000,interaction.depth=4)
+summary(boost.boston)
+par(mfrow=c(1,2))
+plot(boost.boston,i="rm")
+plot(boost.boston,i="lstat")
+yhat.boost=predict(boost.boston,newdata=Boston[-train,],n.trees=5000)
+mean((yhat.boost-boston.test)^2)
+boost.boston=gbm(medv~.,data=Boston[train,],distribution="gaussian",n.trees=5000,interaction.depth=4,shrinkage=0.2,verbose=F)
+yhat.boost=predict(boost.boston,newdata=Boston[-train,],n.trees=5000)
+mean((yhat.boost-boston.test)^2)
+
+
+```
+
+## Lab Assignment
+
+### Problem 1: Implement decision tree from scratch
+
+a) _Warm up_. Write a function called rss() that takes in a vector and returns the residual sum of squares (relative to the mean of the vector).
+
+
+b) _Best Split_. We're next going to write a function best_split() that will form the basis of a decision tree. This function will take in two arguments: a vector predictor variable (ie, x) and a vector target variable (ie, y). This function will identify the single location in the x domain that would yield the best split of the data, such that the two halves now each have least total RSS in the target variable. 
+
+
+Some things to think about:
+ (i) If your input x vector has *n* data points, how many possible split locations are there? 
+ (ii) You can accomplish this task by brute force. For every possible split location, split the data into two parts and compute the new total RSS. Then just return whichever split location was the optimal one. 
+ 
+Make sure your function returns a few things (perhaps in a list): the location of the x split, the mean of y for each of the split parts, the improvement in RSS that was achieved by the split. 
+
+
+
+c) _One Dimensional Data_ Here is a synthetic data set with one predictor and one response. Use your function to find out where the first split would be if $y$ is predicted from $x$ with a regression tree.
+
+```{r}
+x = seq(0,10,by = .01)
+y0 = cos(x/4 + x^2/5)*x^2/20 + x 
+y = y0 + rnorm(length(x))
+mydf = data.frame(x=x,y=y)
+rss0 = 1000*var(y)
+plot(x,y)
+#split0 <- bestsplit(x,y) 
+```
+
+What is the total RSS of y? What this RSS reduced to when you split the data? 
+
+d) _Growing the Tree_ 
+Split the lower half again. Split the upper half again. What is the total RSS now?
+
+e) Try this all again with the same data but with R's tree() function. Make a plot of the tree. Do the first few splits agree with the results of your method?
+
+f) Now that we have a good understanding of how to do recursive binary splitting of a single variable, how do would you handle multiple predictors? 
+
+### Problem 2: Complete one of two problems on abalone shells or airfoil data
+
+Your group will be assigned one of the following problems to go over during lab. You will walkthrough your results at the end of class
+
+#### 2a
+
+_Work with Abalone Data_. These data may be found on the [UC Irvine website](http://archive.ics.uci.edu/ml/). They give various physical characteristics of about 4000 abalone shellfish. The data were collected in Tasmania in 1995. Make sure that the data are in your source directory.
+
+a) We'll try to predict the number of Rings, using the other features. Train a linear model as a baseline case. What is the RSS or Rsquared?
+
+b) Now build a tree and plot it.  We can make the annotation of the tree look better by reducing the font size with the \texttt{cex} parameter. What is the depth of the tree? How many leaves does it have?
+
+c) We can manually prune the tree to whatever depth we want. Use the function prune.tree() to simplify the tree so it only has 4 leaves. Visualize this tree.
+
+d) Which two continuous predictors seem to be highly predictive according to the tree? Draw a sketch of the feature space and the splits in the space, as well as the predicted number of Rings for each region.
+
+e) Decision trees have high variance. Split the Abalone data in half and train two trees (and don't worry about any extra pruning). Observe the differences between them, visualize the two different trees.
+
+
+
+#### 2b
+
+Let's explore the airfoil data. We're going to try to predict the "Pressure" feature from the other features. Use one of the tree aggregation methods we have learned about (Random Forest, Boosting, Bagging)
+
+(a) Start with some exploratory visualizations to see how the other features are related to Pressure. Feel free to use pairs(), or scatterplots, or boxplots. Do any features seem to be strongly predictive of Pressure?
+
+(b) Create a train-test split of the data.
+
+(c) Fit a linear model, observe the $R^2$ on the test set.
+
+(d) Fit a single decision tree, one with large depth. Observe the $R^2$ on the test set. Make a plot of three if you wish.
+
+(e) Fit a tree aggregation model, observe the $R^2$ on the test set.
+

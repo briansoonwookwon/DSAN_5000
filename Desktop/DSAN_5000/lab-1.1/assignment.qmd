@@ -1,0 +1,110 @@
+---
+title: 'Lab-1.1: Assignment'
+jupyter: python3
+---
+
+`Paths, command line basics, and HTML`
+
+**IMPORTANT:** The lab shown here (on the website) is just an HTML version, included for reference. To download the assignment, please navigate to the Labs tab in the Share-point dropdown menu in the website’s navigation bar. The relevant assignment can be determined from the folder’s name, click on the three dots and select download to get access to the assignment.
+
+
+**Note**: We will be  moving back to more "traditional" Data-science methods in the coming weeks, however, we want you to acquire the following Computer-Science fundamentals as early as possible! 
+
+## Assignment-1: Editing files with a CLI
+
+* The GU domains web-servers are Linux, you can “get inside” the servers with a command-line interface via a browser
+  ![](images/2023-08-27-21-06-02.png)
+* **Note**: The GU-Domain computer is a Web-server NOT a compute-cluster. Which means that it is designed to store files and host websites, NOT for “crunching numbers” or processing large amounts of data
+* Open the terminal in the browser at [https://georgetown.domains/](https://georgetown.domains/) (similar to the image above)
+* Modify the file `~/public_html/index.html` from the command line using the following
+  * `cd ~/` 
+  * `nano ./public_html/index.html`
+  ![](images/2023-08-27-21-23-26.png)
+* **Submission**: Take a screenshot of your webpage rendering with in the browser, similar to the following. Name it `lab-1.1.1.png` and upload it to Canvas.
+  ![](images/2023-08-27-21-25-05.png){width=600}
+
+## Assignment-2: Introduction to the command line
+
+* Copy the following commands, ONE AT A TIME, into the terminal in the browser to explore the GU computers filesystem.
+* `Make sure you fully understand what it is doing` 
+* **Notice** that you are NOT interacting with your laptop!! But rather the GU server, which is just a REMOTE computer located somewhere else in the world.
+* **Useful shortcuts:**
+  * (1) The `tab key` is very useful when using the command line. It will `auto-complete` commands for you
+  * (2) The `up and down arrows` are also useful, they let you search through previous commands
+  ```
+  ls
+  clear
+  # comments start with the hash just like in python, this line has no effect
+  ls
+  # you can also put comments in-line, just like python 
+  ls # this will list everything in the directory
+  # the wild-card * is useful for searching for files with specific patterns
+  ls *pub*
+  ls -d *pub*  # -d=directories lists folders only 
+  ls *pub*/*.html
+  # multiple commands can be run on one line using ; to separate them
+  ls *pub*; ls *pub*/*.html
+  pwd
+  #search for a file 
+  find -name index.html
+  #search for a file with a wild-card
+  find -name index*
+  # change current working directory to your website 
+  cd public_html/
+  # more,less, head, tail let you look inside of files
+  more index.html
+  less index.html # press q to exit
+  head index.html
+  tail index.html
+  tail -n 4 index.html #last 4 lines
+  # grep lets you search files for substrings
+  grep 'Hello' index.html
+  # ../ is the folder “below” you in the file tree 
+  pwd ../
+  ls ../
+  cd ../
+  # ./ is the current folder you are in 
+  ls ./
+  cd public_html/
+  pwd ./
+  # ~/ is an alias for the path /home/jfhgeorg
+  cd ~/ 
+  pwd
+  cd public_html/
+  # Make a new folder 
+  mkdir files
+  ls
+  cd files
+  # Make a blank file
+  > page2.html
+  ls
+  # Copy a file
+  cp ../index.html  ./page3.html
+  more page2.html
+  more page3.html
+  pwd
+  # Look at the computers CPU information
+  cat /proc/cpuinfo 
+  history
+  ```
+
+* **Submission**: After running all the commands, simply copy all the text from the terminal (outputs and commands) and save it to a plain text file named `Lab-1.1.2.txt`, upload it to Canvas.
+
+
+## Assignment-3: A simple website {.smaller}
+
+* Use the following download as a starting point for a simple `HTML` website, built "from scratch" (i.e. without Quarto):
+  * [Click here to download](website-template.zip)
+* **Do the following**;
+  * Open the `html` files in VS-code to edit them, and open the same files in a browser to see the rendered result (refresh the webpage to see changes)
+  * rename the folder "my_website"
+  * Replace the penguin with a picture of yourself stored in `my_website/images/photo.png` (make sure it renders on the webpage)
+  * Write a Paragraph to replace the `About me` section with information about yourself. 
+  * Replace the `Academic Interests` and `Education` section with information about yourself
+  * Demonstrate knowledge of the various `HTML` constructs by customizing the file `website-template/pages/html-cheatsheet/cheatsheet.html` with your own content, feel free to use `Lorem Ipsum` placeholder text to accelerate the process. ([https://loremipsum.io/](https://loremipsum.io/))
+  * Include the image in `my_website/images/photo.png` in the webpage `website-template/pages/html-cheatsheet/cheatsheet.html`
+    * Use `relative paths`, NOT `absolute paths` and DON'T make a copy of the `photo.png` file.  
+* **Submission**: When done, compress the folder `my_website` and upload the compressed version to Canvas
+
+
+

@@ -1,0 +1,169 @@
+---
+title: "Lab10"
+output: html_document
+---
+
+```{r}
+require("tree")
+require("gbm")
+require("randomForest")
+require("ISLR")
+```
+
+
+
+
+
+## 1. Decision Trees
+
+We're going to implement our own decision tree. 
+
+a) _Warm up_. Write a function called rss() that takes in a vector and returns the residual sum of squares (relative to the mean of the vector).
+
+b) _Best Split_. We're next going to write a function best_split() that will form the basis of a decision tree. This function will take in two arguments corresponding to a single predictor variable (ie, x) and a single target variable (ie, y). This function will identify the single location in the x domain that would yield the best split of the data, such that the two halves now each have least total RSS. 
+
+Some things to think about:
+ (i) If your input x vector has *n* data points, how many possible split locations are there? 
+ (ii) You can accomplish this task by brute force. For every possible split location, split the data into two parts and compute the new total RSS. Then just return whichever split location was the optimal one. 
+ 
+Make sure your function returns a few things (perhaps in a list): the location of the x split, the mean of y for each of the split parts, the improvement in RSS that was acheived by the split. 
+
+```{r}
+
+rss = function(y){sum((y - mean(y))^2)}
+
+bestsplit = function(x,y){
+   n = length(x)
+   index = 1:n
+   rss0 = rss(y)
+   rssdrop = double(n-1)
+   for (j in 1:n-1){
+     indexj = index < j+1
+     rssdrop[j] = rss0 - (rss(y[indexj]) + rss(y[!indexj]))
+     }
+   j0 = which.max(rssdrop)
+   indexj0 = index < j0+1
+   return(list(xsplit = (x[j0+1] + x[j0])/2, 
+               ylower = mean(y[index < j0+1]), 
+               yupper = mean(y[index > j0]),
+               deltarss = rssdrop[j0])
+          )
+}
+```
+
+c) _One Dimensional Data_ Here is a synthetic data set with one predictor and one response. Use your function to find out where the first split would be if $y$ is predicted from $x$ with a regression tree.
+
+```{r}
+x = seq(0,10,by = .01)
+y0 = cos(x/4 + x^2/5)*x^2/20 + x 
+y = y0 + rnorm(length(x))
+mydf = data.frame(x=x,y=y)
+rss0 = 1000*var(y)
+plot(x,y)
+split0 <- bestsplit(x,y) 
+#split0
+```
+
+What is the total RSS of y? What this RSS reduced to when you split the data? 
+
+d) _Growing the Tree_ 
+
+Split the lower half again.
+```{r}
+index <- x < split0$xsplit
+x1 <- x[index]
+y1 <- y[index]
+split1 = bestsplit(x1,y1)
+split1
+```
+
+
+Split the upper half again.
+```{r}
+index <- x > split1$xsplit
+x2 = x[index]
+y2 <- y[index]
+split2 = bestsplit(x2,y2)
+split2
+```
+
+
+_Now With R_
+Now let's make a tree using the R function. 
+
+```{r,fig.width=5}
+mytree = tree(y ~x, data = mydf)
+names(mytree)
+plot(mytree)
+text(mytree,pretty = 2)
+```
+
+
+You can see that the first few splits are exactly where they were found by the step-by-step computation. 
+Make a plot of the data and a plot of the step function that is obtained from the tree.
+```{r,fig.width=5}
+plot(x,mytree$y, type= 'p', lwd = 2,pch = 46)
+y.pred=predict(mytree,mydf,type= "vector")
+points(x,y.pred, col = "red",pch = 46)
+```
+
+
+
+## 2. Abalone Dataset 
+_Work with Abalone Data_. These data may be found on the [UC Irvine website](http://archive.ics.uci.edu/ml/). They give various physical characteristics of about 4000 abalone shellfish. The data were collected in Tasmania in 1995. Make sure that the data are in your source directory.
+```{r}
+load("abalone.RData")
+head(abalone)
+```
+
+a) We'll try to predict the number of Rings, using the other features. Train a linear model as a baseline case.
+
+b) Now build a tree and plot it.  We can make the annotation of the tree look better by reducing the font size with the \texttt{cex} parameter. What is the depth of the tree? How many leaves does it have?
+
+c) We can manually prune the tree to whatever depth we want. Use the function prune.tree() to simplify the tree so it only has 4 leaves. Visualize this tree.
+
+d) Which two continuous predictors seem to be highly predictive according to the tree? Draw a sketch of the feature space and the splits in the space, as well as the predicted number of Rings for each region.
+
+e) Decision trees have high variance. Split the Abalone data in half and train two trees (and don't worry about any extra pruning). Observe the differences between them, visualize the two different trees.
+
+## 3. Ensemble Methods
+(We'll do this together, nothing to turn in for this part)
+To use Ensemble Tree Methods (eg Random Forest or Bagging) in R, we will use the randomForest() function. Recall that Bagging is actually just a special case of Random Forest, where we don't subsample the columns. Therefore, both methods can be accessed with the same R function, and the parameter 'mtry' which corresponds to the number of columns to subsample down to for each split. For Boosting, we will use the 'gbm' function.
+
+Let's explore the airfoil data. We're going to try to predict the "Pressure" feature from the other features. 
+
+(a) Start with some exploratory visualizations to see how the other features are related to Pressure. Feel free to use pairs(), or scatterplots, or boxplots. Do any features seem to be strongly predictive of Pressure?
+
+
+(c) Fit using one of the Ensembling methods. Observe the $R^2$. Feel free to use R libraries, you don't need to implement these yourself. Visualize the model or model outputs in any way that is available. 
+
+(d) Interpretability and Explainability is important for complex ML models. These tree ensemble methods are much more complex than simpler Decision Trees. But there are a few concepts we can use to help us better understand them. Feature Importance and Partial Dependence Plots are two forms of "global explanations" for a model. 
+
+Feature Importance gives us a relative measure of how importance a particular feauture was in the model's decisioning (aggregated over all data in the training set). It gives a single number per each feature and a way to compare them. 
+
+With a random forest model, we can compute feature importance by adding a parameter.
+```{r}
+rf_fit = randomForest(Pressure ~., data=airfoil, importance=TRUE)
+barplot(rf_fit$importance[,2])
+```
+
+With a gbm model, the feature importances are automatically computed when the model is fit and is included in the model summary.
+
+```{r}
+gbm_fit <- gbm(Pressure~., data=airfoil)
+summary(gbm_fit)$rel.inf
+```
+
+
+A Partial Depedence Plot is another way of looking at how a particular feature impacts a model's predictions. It visualizes the expected value of the prediction, over the full range of the feature. (read more at https://christophm.github.io/interpretable-ml-book/pdp.html)
+
+For a randomForest object,
+```{r}
+partialPlot(rf_fit, airfoil, "Displacement")
+```
+
+For a GBM object,
+```{r}
+plot(gbm_fit, i="Displacement")
+```
+

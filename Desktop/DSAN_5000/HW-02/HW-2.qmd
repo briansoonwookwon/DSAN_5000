@@ -1,0 +1,361 @@
+# Homework-2 
+
+**NOTE**: Please refer to the syllabus for all information about late penalties, deliverable information, expectations, grading policies, etc.
+
+**DUE DATES**: Due dates can be found on each assignment's canvas page AND at the bottom of the syllabus
+
+**SUBMISSION**:
+
+- **Part-1:** Tidying data in R and python  
+  - A template of the directory-tree is provided with the assignment
+  - **You only need to submit a <u>compressed</u> version of the "codes-and-outputs" folder**. 
+    - That folder should include 12 completed files: `loans.R`, `loans.py`, `loans_r.csv`, `loans_py.csv`,`district.R`, `district.py`, `district_r.csv`, `district_py.csv`, `analytical.R`, `analytical.py`, `analytical_r.csv`, `analytical_py.csv`.
+  
+  - Your code should work by pointing back to the data folder one level below where the code is (i.e point at "../data")
+  - **DO NOT SUBMIT THE "data" FOLDER ITSELF** 
+  
+- **Part-2:** Project checkpoint 
+  - Put the following information in the text submission box (no file upload required for part-2)
+  - GU domains URL = INSERT THE URL FOR YOUR GU DOMAINS PROJECT WEBSITE 
+  - Make sure the Data collection and Data-cleaning tabs are seriously attempted and hosted on GU domains before you submit 
+  - **It is important that you submit your URL. This makes things much easier for the grader. Failure to submit your URL will result in an email from the TA requesting the URL and a -5 point deduction from HW-2**
+
+
+## HW-2.1: Tidying data in R and Python 
+
+### Introduction 
+
+The goal of this assignment is to expose students to a real world data-tidying exercise. 
+
+Assume you are hired as a data scientist by a bank offering services for its customers such as managing of accounts, offering loans, etc.
+
+The bank was to improve its services but the bank managers had only vague idea of who was a good customer (whom to offer some additional services) and who was a bad customer (whom to watch carefully to minimize the bank losses). Fortunately, the bank stored data about its clients, the accounts (transactions within several months), the loans already granted, the credit cards issued. The bank managers hoped to improve their understanding of customers and seek specific actions to improve services, however, they failed.
+
+Your job is to prepare and analyze this data and use it to help guide the operations of a new bank that the startup you just joined as a Data Scientist is going to open.
+
+### The Data
+
+The data for all of the bank's operations was contained in an application that used a relational database for data storage, and the data was exported from their system into separate `CSV` files. This is a snaphot dataset, meaning it shows the values that were current at the time of the dataset export. 
+
+The data is contained in the `data.zip` file included in this repository. **You must unzip the file**, which will create a `data/` directory inside this repository. 
+
+*You should write all of your code and save all outputs into the "codes-and-outputs" folder. Your code should work by pointing back to the data folder, one level below where the code is (i.e point at "../data")*
+
+There are eight files in the `data/` and below is a description of the contents of each file. You will practice reading in data, cleaning and rearranging the data, making the data tidy, and joining datasets for the purposes of creating a dataset that is ready to be visualized.
+
+**NOTE**: The first column in each file is just called "id", you should rename it when you load the data-frame. This can be done based on the file name (e.g. in accounts.csv the id column should be renamed account_id, and so one). Notice that some id's are shared by different files, these can be used as common-keys.
+
+`accounts.csv` contains information about the bank's accounts.
+
+| Field Name            | Description                                                 |
+| --------------------- | ----------------------------------------------------------- |
+| `account_id`          | Unique record identifier                                    |
+| `district_id`         | Branch location                                             |
+| `date`                | Date of account opening                                     |
+| `statement_frequency` | The frequency that statements are generated for the account |
+
+`clients.csv` contains information about the bank's customers. A client (customer) can have several accounts.
+
+| Field Name    | Description              |
+| ------------- | ------------------------ |
+| `client_id`   | Unique record identifier |
+| `gender`      | Client's gender          |
+| `birth_date`  | Client's birthday        |
+| `district_id` | Client's location        |
+
+`links.csv` contains information that links customers to accounts, and wether a customer is the owner or a user in a given account.
+
+| Field Name   | Description              |
+| ------------ | ------------------------ |
+| `link_id`    | Unique record identifier |
+| `client_id`  | Client identifier        |
+| `account_id` | Account identifier       |
+| `type`       | Owner or User            |
+
+`transactions.csv` contains all of the bank's transactions.
+
+| Field Name       | Description                                                  |
+| ---------------- | ------------------------------------------------------------ |
+| `transaction_id` | Unique record identifier                                     |
+| `account_id`     | Account identifier                                           |
+| `date`           | Transaction date                                             |
+| `type`           | Debit or Credit                                              |
+| `amount`         | Amount of transaction                                        |
+| `balance`        | Account balance after the transaction is excuted             |
+| `bank`           | The two letter code of the other bank if the transaction is a bank transfer |
+| `method`         | Method of transaction: can be bank transfer, cash, or credit card |
+| `category`       | What the transaction was for                                 |
+
+`payment_orders.csv` contains information about orders for payments to other banks via bank transfers. A customer issues an order for payment and the bank executes the payment. These payments should also be reflected in the `transactions.csv` data as debits.
+
+| Field Name          | Description                                                  |
+| ------------------- | ------------------------------------------------------------ |
+| `order_id`          | Unique record identifier                                     |
+| `account_id`        | Account identifier                                           |
+| `recipient_bank`    | The two letter code of the bank where the payment is going   |
+| `recipient_account` | The account number of at the bank where the payment is going to |
+| `amount`            | Amount of transaction                                        |
+| `payment_reason`    | What the transaction was for                                 |
+
+`cards.csv` contains information about credit cards issued to clients. Accounts can have more than one credit card.
+
+| Field Name   | Description                                        |
+| ------------ | -------------------------------------------------- |
+| `card_id`    | Unique record identifier                           |
+| `link_id`    | Entry that maps a client to an account             |
+| `type`       | Credit Card product name (Junior, Classic or Gold) |
+| `issue_date` | Date the credit card was issued                    |
+
+`loans.csv` contains information about loans associated with accounts. Only one loan is allowed per account.
+
+| Field Name          | Description                                                  |
+| ------------------- | ------------------------------------------------------------ |
+| `loan_id`           | Unique record identifier                                     |
+| `date`              | The date the loan was granted                                |
+| `amount`            | The amount of the loan                                       |
+| `payments`          | The monthly payment of the loan                              |
+| `24_A`, `12_B`, etc | These fields contain information about the term of the loan, in months, wether a loan is current or expired, and the payment status of the loan. _Expired_ means that the contract is completed, wether or not the loan was paid in full or not. _Current_ means that customers are currently making payments (or not). <br/> `A` stands for an expired loan that was paid in full<br/> `B` stands for an expired loan that was not paid in full (it was in default)<br/> `C` stands for a current loan where all payments are being made<br/> `D` stands for a current loan in default due to not all payments being made |
+
+`districts.csv` contains demographic information and characteristics about the districts where customers and branches are located. 
+
+| Field Name          | Description                                                  |
+| ------------------- | ------------------------------------------------------------ |
+| `district_id`       | Unique district identifier                                   |
+| `name`              | District name                                                |
+| `region`            | Region name                                                  |
+| `population`        | Number of inhabitants                                        |
+| `num_cities`        | Number of cities                                             |
+| `urban_ratio`       | Ratio of urban population                                    |
+| `avg_salary`        | Average salary                                               |
+| `entrepreneur_1000` | Number of entrepreneurs per 1,000 inhabitants                |
+| `municipality_info` | An array with the number of municipalities with the following attributes:<br/>* Population < 500<br/>* Population 500-1999<br/>* Population 2000-9999<br/>* Population >= 10000 |
+| `unemployment_rate` | An array with the unemployment rate for '95 and '96 respectively |
+| `commited_crimes`   | An array with the number of commited crimes for '95 and '96 respectively |
+
+![](HW2-relational-diagram.png)
+
+### Assignment: Data cleaning
+
+You need to perform the tasks below in **both** `R` and `Python`. For each task, you need to write two scripts an `.R` script and a `.py` script. **Jupyter notebooks (`.ipynb`) or Rmarkdown (.rmd) are not allowed.** Your scripts must follow these rules and must run on professor/TA machines without any modification:
+
+- No hard coded paths, only relative paths
+- Output files must be saved within the same directory "codes-and-outputs"
+- The code should be well documented and there should be as many comments as possible
+
+We recommend you use any of the `tidyverse` set of packages in `R` and `pandas` in `Python`.
+
+1. Make the `loans.csv` data tidy. You must account for **all** the information contained in each record (row) and that should be in their own field. Remember, for a dataset to be considered tidy, it must meet the following criteria:
+
+   * Each variable must have its own column
+   * Each observation must have its own row
+   * Each type of observational unit forms a table
+
+   The scripts that perform this task are called `loans.R` and `loans.py`. The scripts will produce `CSV` files called `loans_r.csv` and `loans_py.csv`.
+
+1. Make the `district.csv` data tidy. You must account for all the information contained in each record (row).
+
+   The scripts that perform this task are called `district.R` and `district.py`. The scripts will produce `CSV` files called `district_r.csv` and `district_py.csv`.
+
+1. Build an _analytical dataset_ by combining (joining) the data from the different tables as you see fit, which will be used for the purposes of exploratory data analysis, visualization and reporting. The unit of analysis is the _account_. This dataset must contain the following information for each _account_ using the following field names:
+
+   - `account_id`: Account number
+   - `district_name`: Name of the district where the account is
+   - `open_date`: Date when account was opened
+   - `statement_frequency`: The frequency that statements are generated for the account
+   - `num_customers`: The total number of clients associated with the account (owner and users)
+   - `credit_cards`: Number of credit cards for an account or zero if none
+   - `loan`: T/F if the account has a loan
+   - `loan_amount`: The amount of the loan if there is one, `NA` if none
+   - `loan_payments`: The amount of the loan payment if there is one, `NA` if none
+   - `loan_term`: The duration of loan in months, `NA` if none
+   - `loan_status`: The status of the loan (current or expired), `NA` if none 
+   - `loan_default`: T/F if the loan is in default, or `NA` if none
+   - `max_withdrawal`: Maximum amount withdrawn for the account 
+   - `min_withdrawal`: Minimum amount withdrawn for the account 
+   - `cc_payments`: Count of credit payments for the account for all cards
+   - `max_balance`: Maximum balance in the account
+   - `min_balance`: Minimum balance in the account
+
+The scripts that perform this task are called `analytical.R` and `analytical.py`. The scripts will produce `CSV` files called `analytical_r.csv` and `analytical_py.csv`.
+
+## HW-2.2: Project checkpoint
+
+### Overview and motivation: 
+
+**In Assignment 1, you already chose a Data Science Topic that you can create at least 10 (or more) questions about.**
+
+These questions will shift and change as you explore and narrow in on your topic. Do not be afraid of discovery. Data Science is both an art and a science. It is not a set of steps.
+
+**In HW-2.2 you will gather data and complete the initial cleaning of your data.**
+
+Data cleaning is a HUGE and often very time consuming task.
+
+Initial cleaning prepares the data for future subsetting, further cleaning, prep, normalization, transformation, feature generation, remapping, etc.
+
+**Data cleaning is not linear**,  often different cleaning methods are used depending on different models or methods.
+
+* For example, if you use your data for Association rule mining, you will need only qualitative data and must have it in transaction format. (more on this later in the course)
+*  However, and very differently, when you apply Naïve Bayes to your data in R, you may have qualitative and quantitative data that is clean, labeled, and in record format.
+* When you use k-means clustering, you will use only numeric data with no labels.
+
+**At this point, you have already created a Website and you have the URL to various pages on that site.**
+
+Your Website, which is your Portfolio,  MUST contain **TABS (links)** to these EXACT Pages. Please do not change the names so that there is consistency and TAs can locate your items.
+
+* <u>**The following tabs are what you will focus on for HW-2.2**</u> 
+  - **Data Gathering**
+  * **Data Cleaning**
+
+**IMPORTANT NOTE:** AS A ROUGH ESTIMATE, EACH TAB SHOULD CONTAIN ***AT LEAST*** 1000 WORDS <u>BY THE END OF THE SEMESTER</u>
+
+### Data collection
+
+**Start gathering data**. 
+
+* On the data-gathering tab, explain all methods and sources for your data. Create and include screen images (figures) of data you collected. It is NOT necessary (or feasible) to create an image of entire datasets. Rather, create an image that illustrates the data you collected well enough for a viewer/reader to understand.
+* **Transparency is essential** 
+  * Anyone should be able to use your site to access/see/link to the raw data you are gathering.
+    * In other words, any person who views your site should know EXACTLY how and where you got your data, should have access to your R and Python API code, should have an idea of what the raw data looks like, and should be able to replicate your work to this point.
+  * Example 1: If you download data, have a link to that dataset from your site.
+  * Example 2: When you use an API to gather data, have a link to that data on your site.
+  * Use images to illustrate small "views" of the raw data, screenshots for example.
+
+* Gather data that you can later use to try to address your 10 questions.
+* This **MUST** be done using at least one Python API, and at least one R API, along-side other methods.
+* Try to get as many formats as possible;
+  * e.g. labeled data, qualitative data, quantitative data, text data (such as from BBC News, wikipedia, or Reddit), Geo data (such as locations), record-data etc. 
+* The more data you have at first, the easier it will be for you to subset, sample, prepare, clean, format, and explore it in order to create your data-science Story. 
+<!-- * **You DO NOT do exploratory visualization or analysis on the data yet.**  -->
+* **NOTE: There are no limits or rules on data "size".**
+  * If you have too little data, you will likely end of needing to get and clean more later, or use boot-strapping methods.
+  * If you have too much data, you will likely need to use smaller subsets to down-sample of the data.
+  * *Recommended*: Avoid BIG DATA unless you wish to manage big data issues. You are allowed to, but it will add a lot of work for you.
+  * **Data is not about size; it is about value.** Think about telling a story, think about how you might use the data you have for text analysis, clustering, classification, and regression. Get data that will enable you to perform the topics in this class and the tabs you added to your site above. ALWAYS think about solutions and not “how big or small” your data is.
+* Again, this process will EVOLVE, your questions may change, you may generate further questions, you may need more data, etc. Thats okay, it is part of the process 
+
+### Data-cleaning tab:
+
+On your website, you have a link/tab called Data Cleaning. When a User goes to your site, they will click this TAB and have access to all of your data, descriptions about how it was cleaned, and access to the codes used to clean it.
+
+**To be clear - you DO NOT need to clean ALL** of the data you have right now. You certainly can and likely will as we move through this class. But for THIS ASSIGNMENT - do the above. 
+
+**CODE REQUIREMENTS**
+
+It should be easy to recycle the Lab-2.1 code and the "HW-2.1" code for this section. As well as various codes shared by the professors in "shared/codes"
+
+* Have **R code that cleans record, labeled data** that has both qualitative and quantitative variables. (required). This must link to raw, cleaned-data, and the code. This should be applied to your project data NOT toy data-sets. 
+  * **WHEN CODING, ALWAYS START SMALL AND SIMPLE AND THEN SCALE UP** 
+*  Have **Python code that cleans text data and includes a label** (from corpus or csv or both) and you MUST use CountVectorizer. This should be applied to your project data NOT toy data-sets. 
+*  (Optional but recommended) Have R code that cleans text data from a corpus for your project.
+*  (Optional but recommended) Have Python code that cleans record data for your project.
+
+**TAKING IT FURTHER** 
+
+Once you are done with the minimum requirements. Then can you expand (if you have time) into cleaning further data and/or cleaning text data in other formats. 
+
+The more you do - the more you will learn!
+
+For example, I strongly suggest that you have code for corpus --> DF, csv --> DF, json --> DF. 
+
+However, this is NOT REQUIRED, but a good idea. 
+
+**TRANSPARANCY REQUIREMENTS**
+
+ It is required that your website links to raw-data, cleaned-data, and code used to clean on site .
+
+To do this, simply continue to host your cleaning codes and data in the GitHub repository. 
+
+**Provide a link to ALL CODE that you write to clean the data** so that someone could start with your raw data, run your code, & end up with your clean datasets. Make you steps EASY to see, transparent, easy to review. 
+
+### What to discuss on the "data cleaning" tab
+
+**Think about how to arrange your site**. Think about load time. Think about ease of navigation. On the job, much of what you do will be used by other people and so these steps are critical in the real world.
+
+Next, all of your initial data is called **RAW DATA**. So, on your site, you will link to all of your raw data so that anyone can download your raw data and clean or use it (in the data tab link to your cloud data hosting repository).
+
+**There are many ways to link to datasets**. You may upload them to the Server, you may place the data in git or any other online location, etc. Just be sure that when a User comes to your site, they can click links to see your raw datasets.
+
+Next, for each dataset that you collect, you will need to start to prepare it for analysis.
+
+This is part of **cleaning**.
+
+**Cleaning should be transparent and clear** so that anyone can repeat what you did and can end up with the same cleaned dataset.
+
+Explain methods that you use which would not be familiar to an outside reader.
+
+**One of the goals of cleaning is to retain the integrity & information contained in the original data**.
+
+ So, as you clean, you will **visualize** the issues and the clean results and you will also offer **before** and **after** notes and images about the datasets.
+
+For example, suppose you have a dataset with 10 columns in record format. Next, suppose your first step is the deal with missing values. First, you already have a link to the raw dataset. Next, you might have a visualization that is a figure of a small portion of the dataset in non-clean format so that others can *see* how it looked BEFORE you clean it. Finally, always keep track of the number of rows you have BEFORE you start to clean. If you lose rows, you must note this at the end of the cleaning process.
+
+Next, and again if you have record data (as an example) with say 11 columns (also arbitrary), you would find (via code) all the missing values in each column. Discuss this on your site. Think of your site as a personal tutorial for YOU so that in a year you will still know what you did.
+
+Suppose the first column is AGE and it has 5 missing values. This will mean that you will need to determine how to correct them. There are MANY ways, including, but not limited to removing the entire row (not ideal but sometimes necessary), replacing the missing value with a measure such as the mean or median, etc.
+
+Once the column is clean, you can include a visualization of the data and notes about what was done and how it affects the column. Did you remove rows? If yes, how many (what % of the data was lost). Did you replace missing values with the mean? If yes, did this change the variation or prediction quality of the data.
+
+As a second example, you likely have TEXT type data. This data is cleaned very differently. Here, you must vectorize the data. You may choose to remove stop-words, etc. when you vectorize and so your resulting data-frame may already be clean. Here again, show an image of the before (you have this as raw data) and the after – the vectorized data. Images of data are always small portions because datasets are big.
+
+The key here is that you will clean and prepare your data. This will be a little different for everyone, because everyone has different data. Only you can look at your data and think about how to clean it up.
+
+**For record data,** there are some **steps** (not all) that are always considered:
+
+- Missing value management
+- Incorrect value or incorrect value format management
+- Creating new features via binning 
+- Subsetting data so create only quantitative columns, or only qualitative columns, or mixed (depending on what you need) 
+
+At the end of this Assignment, you will have **cleaner** data and your Portfolio will be filled with links, explanations, before&after, and images&vis of the data cleaning process so that **anyone can replicate your work.**
+
+Everyone’s experience will be a little different.
+
+Be sure to use visualizations.
+
+Once you complete these first stages of cleaning, you will be able to further prepare your data as we investigate other models and methods.
+
+So – do not think of this as **fully cleaning the data** as that is impossible. Rather, think of this Assignment as getting your data into a cleaner state that will enable you to further (and later) prepare it for modeling.
+
+### Frequently asked questions (FAQ)
+
+-  **What if I have a record dataset with thousands of columns. How can I clean this??**
+
+Cleaning takes a very large amount of time. If you have HUGE data, I recommend using a **subset of it**. Often data that you gather has columns that are highly correlated with other columns and/or are not critical to your topic or analysis. This is YOUR data – you may sample and subset it as you wish.
+
+For your record datasets, I recommend no more than 15 columns and a label column. If you have several record datasets, that is OK, but again, you may need to reduce your total data to avoid overwhelming yourself. That is OK and up to you.
+
+-  **My Text data has 1000s of columns!!**
+
+Yes, text data will always have 1000s of columns once it is vectorized. However, cleaning text is different than cleaning record data and so the number of columns in the text data is not a problem. I find that wordclouds are GREAT for visualizing text data. 
+
+-  **I downloaded a dataset from site whatever and its already clean. Do I still have to clean it?**
+
+No data is already clean :) Data always can be cleaned further. You will still need to show the before and after, visualize the columns, remove columns that are not needed, etc. You MUST write code to CHECK if the data is clean as using your eyes is not sufficient or appropriate. If you find that much or some of your data is nice, you can spend some time on feature generation, aggregation, or more time on your text data, etc.
+
+The key here is to write code that CHECKS your data and assures that it is clean.
+
+-  **When we get to Association Rule Mining (ARM), we will need transaction data. Do I need to find this?** 
+
+No. You will reformat a sample of one of your datasets into transaction data. We will get to that….but not in Mod 2.
+
+-  **If I want to start to format my data (after it is clean) so that some is just numeric and some is labeled, etc. can I?**
+
+Yes you can do this
+
+* **Will everyone's cleaning steps be the same?**
+
+No, because everyone's data is different. Some overall goals (as noted above such as missing values, junk, etc. ) will be managed by everyone.
+
+* **What if you think your data is already clean?**
+
+Most likely it is not, Write code to practice cleaning. For example, even if you can SEE that you have no missing values - write the code anyway and check. Prove it visually as well. Pretend you have 1 million rows of data and cannot check with your eyes. 
+
+
+
+
+
+ 
+
+ 
+
+  

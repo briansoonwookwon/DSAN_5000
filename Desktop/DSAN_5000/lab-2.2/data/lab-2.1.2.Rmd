@@ -1,0 +1,313 @@
+---
+title: "lab-2.1"
+author: "Veo Chae"
+date: '2022-09-18'
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+ # Lab-2.1: Cleaning record data in R and Python
+
+  *Author James Hickman, post any questions to slack* 
+  
+**Name:** Veo Chae
+
+**Lecture section:** ANLY 501-04
+
+**Lab section:** ANLY 501-05
+
+**Instructions** 
+  * Part-1: Read and work through all tutorial content and do all exercises below using python
+  * Part-2: Create a .rmd file, copy all markdown content into the .rmd file, and repeat all coding exercises below in R instead of python (using tibbles instead of data-frames)
+
+**Submission:**
+* You need to upload TWO documents to Canvas when you are done
+  
+  * (1) A PDF (or HTML) of the completed .ipynb document (python submission) 
+  * (2) A PDF (or HTML) of the completed .rmd document (R submission) 
+<br><br/>
+
+* **BOTH ARE REQUIRED, YOU CANNOT DO JUST ONE OR THE OTHER**
+* The final uploaded version should NOT have any code-errors present 
+* All outputs must be visible in the uploaded version, including code-cell outputs, images, graphs, etc
+
+### Cleaning record data 
+
+In practice, there is no "one size fits all" method for data cleaning. 
+
+How you clean the data depends on your objective and what kind of data you have (e.g. record, text, transaction,.. etc) 
+
+Record data is very common, therefore we will focus on this as a example case, specifically the following common operations. 
+
+* merging data frames
+* Removing un-needed columns 
+* Dealing with missing values and non-sense values 
+* standardization 
+* normalization 
+
+We will intentionally focus on an overly simply toy data set, the focus is on the operations, not the complexity of the data
+
+### Read in the data 
+
+* Use pandas to read in the "example-1.csv" and "example-2.csv" files in the folder named "data"
+  
+* Before moving further, open the files in VSC, install relevant .csv extensions (optional), manually expect the data and look for obvious issues 
+
+
+```{r}
+
+
+library('tidyverse')
+
+# INSERT CODE TO READ THE DATA FILES 
+df1 = read.csv("./example-1.csv")
+df2 = read.csv("./example-2.csv")
+
+ 
+# LOOK AT FIRST COUPLE LINES
+head(df1)
+head(df2)
+
+# LOOK AT LAST COUPLE LINES
+tail(df1)
+tail(df2)
+ 
+colnames(df1)
+colnames(df2)
+
+## INSERT CODE TO REMOVE SPACES FROM COLUMN NAMES
+print("NOT REQUIRED R REMOVES SPACES UPON READING")
+
+# INSERT CODE TO RENAME THE COLUMN NAME "age" --> "age_years" and "country" as "country_of_origin"
+df1$age_years = df1$age
+df1$age = NULL
+df2$country_of_origin = df2$country
+df2$country = NULL
+
+# PRINT THE MODIFIED COLUMN NAMES WHEN DONE
+colnames(df1)
+colnames(df2)
+ 
+#INSERT CODE TO CONVERT TYPECAST "housing_payment_pesos" AS TYPE "FLOAT"
+df2$housing_payment_pesos = as.numeric(df2$housing_payment_pesos)
+str(df2)
+ 
+#INSERT CODE TO CONVERT "housing_payment_pesos" to USD
+# 1 Mexican Peso = 0.050 USD
+# 1 USD = 19.88 Mexican Peso
+#INSERT CODE TO RENAME "housing_payment_pesos" to "housing_payment_usd"
+
+df2$housing_payment_usd = df2$housing_payment_pesos *0.05
+df2$housing_payment_pesos = NULL
+ 
+# INSERT CODE TO MAKE SURE ALL "US" TAGS equal "usa" and all "MEX" tags equal "mex"
+df2[df2 ==' US' | df2 == ' USA' | df2 == ' usa'] <- 'usa'
+df2[df2 ==' MEX' | df2 == ' mex'] <- 'mex'
+
+```
+### Merging data sets 
+
+The easiest way to merge data files is when a "common-key" exists (i.e. a column shared by both files) 
+
+In our toy example the customer_id can be used as a common key 
+
+Data sets are typically merged using SQL type join operations (inner,outer,left,right). 
+
+See the lecture slides for examples and codes for these join operations. 
+
+```{r}
+# INSERT CODE TO DO AN "OUTER" JOIN FOR THE TWO DATA-FRAMES USING "CUSTOMER_ID" AS COMMON KEY
+df = merge(df1,df2, by = "customer_id", all = T)
+
+# INSERT CODE TO: REPLACE ALL CELLS THAT ARE ENTIRELY SPACE (OR EMPTY) WITH NAN 
+print("NOT NEEDED, R ALREADY DOES UPON READING")
+
+# INSERT CODE TO PRINT THE SHAPE OF THE NEW DATAFRAME
+dim(df)
+ 
+# INSERT CODE TO COUNT THE NUMBER OF MISSING VALUES IN EACH COLUMN (use google)
+colSums(is.na(df))
+ 
+### INSERT CODE TO REMOVE THE COLUMNS "initials" AND "num_children", 
+df$initials = NULL
+df$num_children = NULL
+
+# INSERT CODE TO PRINT THE NEW DATA-FRAME AND ITS SHAPE
+df
+dim(df)
+ 
+## INSERT CODE TO REPLACE THE STRING "nan" WITH NAN, PRINT THE NEW DATA-FRAME WHEN DONE
+print("NOT NEEDED, R CONVERTED TO NA")
+
+print(df)
+```
+### Dealing with non-sense values 
+
+Often there are values in the data that are clearly NOT legitimate, such as negative ages, or strings where numbers should be.
+
+You want to remove these before doing any averaging or other statistics because they will tamper with the results. 
+
+For example, the average is highly sensitive to outliers, so negative ages would badly skew the mean.
+
+```{r}
+## RUN THE FOLLOWING CODE, THIS USES A CONDITIONAL TO ONLY KEEP ROWS WHERE "age_years"=NaN 
+sample = df[is.na(df$age_years), ]
+df= df[!is.na(df$age_years), ]
+
+## INSERT CODE TO REPLACE ANY NEGATIVE "age_years" WITH NUMPY "NaN" OBJECT
+## There are multiple ways to do this, for example you can iterate over the 
+# rows and use apply with a lambda function to enforce the conditional
+df[df$age_years <0,4] <- NA
+
+## RUN THE FOLLOWING CELL TO REMOVE ANY WHITE SPACE FROM "yearly_income_usd"
+df$yearly_income_usd <- gsub(" ", "", df$yearly_income_usd)
+
+## INSERT CODE TO REPLACE ANY "yearly_income_usd" THAT IS A STRING WITH NUMPY nan OBJECT
+df$is_house_owner <- gsub("NaN", NA, df$is_house_owner)
+
+
+# PRINT THE DATA FRAME
+df
+
+
+```
+### Dealing with missing values 
+
+There are many options to deal with missing values, some are better than others
+
+The easiest, and probably the worst option, is to just throw out any row with NaN
+
+```{r}
+
+# INSERT CODE TO THROW AWAY ANY ROW WITH "NaN" 
+# JUST PRINT THE OUTPUT, DONT RE-DEFINE THE DATAFRAME
+df[complete.cases(df),]
+
+```
+
+**IMPORTANT README**
+
+Another option would be to replace the missing value with a typical value that summarizes that column, such as the mean, median, or mode. 
+
+In practice, you need to be careful when doing this! You are essentially tampering with the data. 
+
+You MUST document changes of this kind and be TRANSPARENT, otherwise it could be viewed as academic or professional dishonesty. 
+
+Especially if it dramatically effects your results.
+
+Doing so will also effect all future analysis, since you are forcing a data point to become an "average" data point. 
+
+For example, if you were looking for good basketball player's in a data driven way. Then replacing an unknown height with the "mean" would likely be a bad idea. 
+
+In this case, you are making someone who might be 7 ft tall appear to be average height. 
+
+You could also use more sophisticated methods such as MICE or regression to fill in the missing values (more on this next week).
+
+Finally, you might be able to logically infer the value from other columns in the data set.
+
+For example, if you have data on the price of someones house, you could likely predict their monthly payment assuming a typical 10-20% down payment and using a mortgage payment calculation formula.
+
+This would be acceptable as long as you document your assumptions, approximations, and methods. 
+
+
+``` {r}
+# INSERT CODE TO TYPE-CAST ALL OF THE FOLLOWING COLUMNS AS FLOATS
+# ["customer_id","age_years","account_balance_usd","yearly_income_usd","housing_payment_usd"]
+str(df)
+
+num_col = c("customer_id","age_years","account_balance_usd", "yearly_income_usd","housing_payment_usd")
+df[df$yearly_income_usd=="USA",3] <- NA
+
+df[num_col] = as.numeric(unlist(df[num_col]))
+                         
+str(df)
+
+# INSERT CODE TO COMPUTE AND PRINT THE MEAN,MEDIAN, AND STD DOWN THE COLUMNS (DO EACH IN ITS OWN CELL)
+# NOTICE THAT ONLY THE NUMERICAL ROWS ARE COMPUTED (YOU CAN IGNORE ANY DEPRECATION WARNINGS)
+# print((df[["age_years","account_balance_usd"]]).mean(axis=1))
+
+#mean and median can be calculated through summary() function
+summary(df)
+
+#standard deviation 
+for (i in c(1:length(num_col))){
+  print(paste0(num_col[i]," sd:  ",sd(df[,num_col[i]], na.rm = TRUE)))
+  }
+
+# INSERT CODE TO REPLACE ANY "NaN" in "age_years" WITH THE 
+df[is.na(df$age_years), 4] <- mean(df$age_years, na.rm = TRUE)
+
+
+# INSERT CODE TO REPLACE ANY "NaN" in "yearly_income_usd" WITH THE MEDIAN
+df[is.na(df$yearly_income_usd), 3] <- median(df$yearly_income_usd, na.rm = TRUE)
+
+
+# INSERT CODE TO THROW AWAY ANY ROW WITH "NaN" 
+# THIS TIME RE-DEFINE THE DATAFRAME WITHOUT THE "NaN"
+df = df[complete.cases(df),]
+df
+
+
+```
+
+## De-duplication
+
+Notice how the customer_id=1 is represented twice in the data set. 
+
+This can be un-desireable, since it adds extra weight (importance) to that data point. 
+
+For example, linear-regression would put twice as much importance on fitting that point as opposed to the others.
+
+``` {r}
+# INSERT CODE TO REMOVE ROWS WITH DUPLICATES IN "customer_id" (KEEP THE FIRST VALUE ENCOUNTERS)
+df = df[!duplicated(df$customer_id), ]
+# PRINT THE DATAFRAME
+df
+```
+
+### Normalization 
+
+Normalization of a vector is the process of making the vector have a unit length (i.e. $|\mathbf{v}|=1$)
+
+$\mathbf{v}_{norm}=\frac{\mathbf{v}}{|\mathbf{v}|}$
+
+We can do a similar thing with a vector of data (e.g. h=heights with units ft). 
+
+This is done using the following normalization process 
+
+$\mathbf{h}_{norm}=\frac{\mathbf{h}-\mu_h}{\sigma_h}$
+
+Where $\mu_h, \sigma_h$ are the mean (center) and standard deviation (width) of the height distribution.
+
+This process makes a new vector $\mathbf{h}_{norm}$ which is a dimensionless quanity, meaning that it doesn't have units. 
+
+The units cancel in the division arising during the normalization equation. 
+
+This also forces the data into a standard range of roughly [-3 to 3] while still preserving the "shape" of the data.
+
+Often, when training machine learning models, it is important to normalize the data first. 
+
+The model will have a much easier time "fitting" if every input is in a standard range of [-3 to 3]
+
+You can always "un-do" the normalization and re-assign the units by algebraically re-arranging the formula.
+
+$\mathbf{h}=\mathbf{h}_{norm} \sigma_h+\mu_h$
+
+``` {r}
+
+# INSERT CODE TO NORMALIZE THE COLUMN "housing_payment_usd" 
+# INSERT CODE TO RENAME THE COLUMN "housing_payment_usd" --> "housing_payment_normalized"
+
+df$housing_payment_normalized = (df$housing_payment_usd - mean(df$housing_payment_usd)) / sd(df$housing_payment_usd)
+df$housing_payment_usd = NULL
+
+# PRINT THE DATA FRAME
+
+df
+```
+
